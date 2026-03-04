@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tinder ETE — FAETEC</title>
+    <style>
+        :root {
+            --faetec-blue: #00478F;
+            --faetec-light-blue: #0066CC;
+            --bg-color: #f4f4f9;
+            --text-main: #333;
+            --text-muted: #666;
+            --danger: #dc3545;
+            --success: #28a745;
+            --white: #ffffff;
+            --border: #e0e0e0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+        body {
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            color: var(--text-main);
+        }
+
+        #app {
+            width: 100%;
+            max-width: 480px;
+            background: var(--white);
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Headers */
+        header {
+            background: var(--faetec-blue);
+            color: var(--white);
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow-y: auto;
+            background: var(--bg-color);
+        }
+        .screen.active { display: flex; }
+
+        /* Forms & Inputs */
+        .form-container { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        input[type="text"], input[type="password"], input[type="url"], textarea {
+            width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;
+        }
+        button.primary-btn {
+            width: 100%; background: var(--faetec-blue); color: var(--white); border: none; padding: 12px;
+            border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.3s;
+        }
+        button.primary-btn:hover { background: var(--faetec-light-blue); }
+        button.secondary-btn {
+            width: 100%; background: transparent; color: var(--faetec-blue); border: 1px solid var(--faetec-blue);
+            padding: 12px; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 10px;
+        }
+        
+        /* Discover / Cards */
+        .card-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .profile-card {
+            width: 100%; max-width: 350px; background: var(--white); border-radius: 15px; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;
+        }
+        .profile-card img { width: 100%; height: 300px; object-fit: cover; }
+        .profile-info { padding: 15px; }
+        .profile-info h2 { font-size: 1.5rem; margin-bottom: 5px; }
+        .profile-info p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px; }
+        .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 10px; }
+        .tag { background: #e0eaf5; color: var(--faetec-blue); padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; }
+        
+        .actions { display: flex; justify-content: center; gap: 20px; padding: 20px; width: 100%; max-width: 350px;}
+        .action-btn {
+            width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 1.5rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .btn-pass { background: var(--white); color: var(--danger); border: 2px solid var(--danger); }
+        .btn-like { background: var(--white); color: var(--success); border: 2px solid var(--success); }
+        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; }
+
+        /* Matches List */
+        .match-item {
+            display: flex; align-items: center; padding: 15px; border-bottom: 1px solid var(--border);
+            background: var(--white); cursor: pointer; transition: background 0.2s;
+        }
+        .match-item:hover { background: #f8f9fa; }
+        .match-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; }
+        .match-info h4 { margin: 0; font-size: 1.1rem; }
+        .match-info p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Chat */
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 75%; padding: 10px 15px; border-radius: 15px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; }
+        .message.sent { background: var(--faetec-blue); color: var(--white); align-self: flex-end; border-bottom-right-radius: 5px; }
+        .message.received { background: #e9ecef; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 5px; }
+        .chat-input-area { display: flex; padding: 10px; background: var(--white); border-top: 1px solid var(--border); }
+        .chat-input-area input { flex: 1; border: none; background: #f1f1f1; padding: 12px; border-radius: 20px; outline: none; }
+        .chat-input-area button { background: transparent; border: none; color: var(--faetec-blue); font-weight: bold; padding: 0 15px; cursor: pointer; }
+
+        /* Navigation Bottom */
+        .bottom-nav {
+            display: flex; justify-content: space-around; background: var(--white); border-top: 1px solid var(--border); padding: 10px 0;
+        }
+        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; padding: 10px; flex: 1; font-weight: bold; }
+        .nav-item.active { color: var(--faetec-blue); border-bottom: 3px solid var(--faetec-blue); }
+
+        /* Modals */
+        .modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            display: none; justify-content: center; align-items: center; z-index: 100;
+        }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--white); padding: 25px; border-radius: 15px; width: 90%; max-height: 90%; overflow-y: auto; }
+        
+        .alert { padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; display: none; }
+        .alert.error { background: #f8d7da; color: #721c24; display: block; }
+        .alert.success { background: #d4edda; color: #155724; display: block; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <header>
+        <span id="header-title">Tinder ETE</span>
+    </header>
+
+    <div id="rules-modal" class="modal">
+        <div class="modal-content">
+            <h2>Regras de Convivência</h2>
+            <ul style="margin: 15px 0; padding-left: 20px; font-size: 0.9rem; color: var(--text-muted);">
+                <li>Respeito mútuo é inegociável.</li>
+                <li>Zero tolerância a assédio ou bullying.</li>
+                <li>Proibido conteúdo sexual explícito.</li>
+                <li>Não compartilhe dados sensíveis (CPF, endereço).</li>
+                <li>Aviso: Este app foi feito para fins acadêmicos. Seus dados básicos são visíveis na rede.</li>
+            </ul>
+            <button class="primary-btn" onclick="acceptRules()">Ao continuar, eu concordo</button>
+        </div>
+    </div>
+
+    <div id="auth-screen" class="screen active">
+        <div class="form-container">
+            <h2 style="text-align: center; color: var(--faetec-blue); margin-bottom: 20px;">Bem-vindo</h2>
+            <div id="auth-alert" class="alert"></div>
+            
+            <div id="login-form">
+                <div class="form-group"><label>Seu Nome (Login)</label><input type="text" id="login-nome"></div>
+                <div class="form-group"><label>Senha de Acesso</label><input type="password" id="login-senha" placeholder="etectinder"></div>
+                <button class="primary-btn" onclick="login()">Entrar</button>
+                <button class="secondary-btn" onclick="toggleAuthMode()">Não tem conta? Criar</button>
+            </div>
+
+            <div id="register-form" style="display: none;">
+                <div class="form-group"><label>Nome</label><input type="text" id="reg-nome"></div>
+                <div class="form-group"><label>Turma (ex: 1301)</label><input type="text" id="reg-turma"></div>
+                <div class="form-group"><label>Curso</label><input type="text" id="reg-curso" placeholder="Informática"></div>
+                <div class="form-group"><label>Interesses (separados por vírgula)</label><input type="text" id="reg-interesses" placeholder="Música, Jogos, Programação"></div>
+                <div class="form-group"><label>URL da Foto de Perfil</label><input type="url" id="reg-foto" placeholder="https://link-da-imagem.com/foto.jpg"></div>
+                <div class="form-group"><label>Senha de Acesso</label><input type="password" id="reg-senha" placeholder="etectinder"></div>
+                <p style="font-size: 0.75rem; color: var(--danger); margin-bottom: 10px;">Aviso: Autenticação simplificada. Não use dados confidenciais.</p>
+                <button class="primary-btn" onclick="register()">Criar Conta</button>
+                <button class="secondary-btn" onclick="toggleAuthMode()">Já tenho conta</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="swipe-screen" class="screen">
+        <div class="card-container" id="card-container">
+            <div class="empty-state">Buscando perfis...</div>
+        </div>
+    </div>
+
+    <div id="matches-screen" class="screen">
+        <div id="matches-list">
+            <div class="empty-state">Carregando matches...</div>
+        </div>
+    </div>
+
+    <div id="chat-screen" class="screen">
+        <div style="background: var(--faetec-light-blue); color: white; padding: 10px; display: flex; align-items: center;">
+            <button onclick="closeChat()" style="background:none;border:none;color:white;font-size:1.2rem;margin-right:10px;cursor:pointer;">←</button>
+            <h3 id="chat-title">Nome do Match</h3>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Digite uma mensagem..." onkeypress="handleChatEnter(event)">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav" id="bottom-nav" style="display: none;">
+        <button class="nav-item active" onclick="switchTab('swipe')">Descobrir</button>
+        <button class="nav-item" onclick="switchTab('matches')">Matches & Chat</button>
+        <button class="nav-item" onclick="logout()">Sair</button>
+    </div>
+</div>
+
+<script type="module">
+    // --- FIREBASE IMPORTS (V10 CDN) ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, onSnapshot, serverTimestamp, setDoc, doc, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // --- CONFIGURAÇÃO FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyBenjJjuU_Z4_y1FZcN95duKf3Xgv0hkE4",
+        authDomain: "tinder-ete.firebaseapp.com",
+        projectId: "tinder-ete",
+        storageBucket: "tinder-ete.firebasestorage.app",
+        messagingSenderId: "946296616030",
+        appId: "1:946296616030:web:9f5a58bf8c2f269e04f0cf"
+    };
+
+    // --- GLOBAL STATE ---
+    const GLOBAL_PASSWORD = "etectinder";
+    window.db = null;
+    window.currentUser = null;
+    window.profiles = [];
+    window.currentProfileIndex = 0;
+    window.activeChatId = null;
+    window.chatUnsubscribe = null;
+
+    // --- INITIALIZATION ---
+    window.onload = () => {
+        try {
+            const app = initializeApp(firebaseConfig);
+            window.db = getFirestore(app);
+            checkSession();
+        } catch (error) {
+            console.error("Erro ao inicializar Firebase:", error);
+            alert("Erro de conexão com o banco de dados.");
+        }
+    };
+
+    // --- UI HELPERS ---
+    const $ = id => document.getElementById(id);
+    const showAlert = (id, msg, type) => {
+        const el = $(id); el.textContent = msg; el.className = `alert ${type}`;
+        setTimeout(() => el.style.display = 'none', 3000);
+    };
+    
+    window.toggleAuthMode = () => {
+        const isLogin = $('login-form').style.display !== 'none';
+        $('login-form').style.display = isLogin ? 'none' : 'block';
+        $('register-form').style.display = isLogin ? 'block' : 'none';
+    };
+
+    // --- AUTH (FAKE AUTH) ---
+    function checkSession() {
+        const userStr = localStorage.getItem('tinder_user');
+        if (userStr) {
+            window.currentUser = JSON.parse(userStr);
+            showMainApp();
+        }
+    }
+
+    window.login = async () => {
+        const nome = $('login-nome').value.trim();
+        const senha = $('login-senha').value;
+        if(senha !== GLOBAL_PASSWORD) return showAlert('auth-alert', 'Senha inválida!', 'error');
+        if(!nome) return showAlert('auth-alert', 'Digite seu nome.', 'error');
+
+        try {
+            const q = query(collection(window.db, "users"), where("nome", "==", nome));
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) return showAlert('auth-alert', 'Usuário não encontrado.', 'error');
+            
+            window.currentUser = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+            localStorage.setItem('tinder_user', JSON.stringify(window.currentUser));
+            showMainApp();
+        } catch (e) {
+            console.error(e);
+            showAlert('auth-alert', 'Erro ao logar. Verifique as permissões do Firestore.', 'error');
+        }
+    };
+
+    window.register = async () => {
+        const nome = $('reg-nome').value.trim();
+        const turma = $('reg-turma').value.trim();
+        const curso = $('reg-curso').value.trim();
+        const interesses = $('reg-interesses').value.trim();
+        const foto = $('reg-foto').value.trim();
+        const senha = $('reg-senha').value;
+
+        if(senha !== GLOBAL_PASSWORD) return showAlert('auth-alert', 'Senha de acesso inválida!', 'error');
+        if(!nome || !turma || !foto) return showAlert('auth-alert', 'Preencha os campos obrigatórios.', 'error');
+
+        $('rules-modal').classList.add('active'); // Mostra regras antes de salvar
+    };
+
+    window.acceptRules = async () => {
+        $('rules-modal').classList.remove('active');
+        const userData = {
+            nome: $('reg-nome').value.trim(),
+            turma: $('reg-turma').value.trim(),
+            curso: $('reg-curso').value.trim(),
+            interesses: $('reg-interesses').value.trim().split(',').map(i => i.trim()),
+            foto: $('reg-foto').value.trim(),
+            createdAt: serverTimestamp()
+        };
+
+        try {
+            const docRef = await addDoc(collection(window.db, "users"), userData);
+            window.currentUser = { id: docRef.id, ...userData };
+            localStorage.setItem('tinder_user', JSON.stringify(window.currentUser));
+            showMainApp();
+        } catch (e) {
+            console.error(e);
+            showAlert('auth-alert', 'Erro ao criar conta. Verifique Firestore.', 'error');
+        }
+    };
+
+    window.logout = () => {
+        localStorage.removeItem('tinder_user');
+        window.currentUser = null;
+        $('swipe-screen').classList.remove('active');
+        $('matches-screen').classList.remove('active');
+        $('chat-screen').classList.remove('active');
+        $('bottom-nav').style.display = 'none';
+        $('auth-screen').classList.add('active');
+    };
+
+    // --- MAIN APP / NAVIGATION ---
+    function showMainApp() {
+        $('auth-screen').classList.remove('active');
+        $('bottom-nav').style.display = 'flex';
+        switchTab('swipe');
+        loadProfiles();
+    }
+
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        
+        event && event.target.classList.add('active');
+        $(`${tab}-screen`).classList.add('active');
+        
+        if(tab === 'matches') loadMatches();
+    };
+
+    // --- SWIPE LOGIC ---
+    async function loadProfiles() {
+        $('card-container').innerHTML = '<div class="empty-state">Buscando perfis...</div>';
+        try {
+            // Pega todos (em prod, limite isso. Aqui é didático)
+            const snapshot = await getDocs(collection(window.db, "users"));
+            let allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Filtra o próprio usuário
+            allUsers = allUsers.filter(u => u.id !== window.currentUser.id);
+
+            // Busca os que eu já dei like/pass (Simulando buscando da tabela likes onde from = myId)
+            const likesQ = query(collection(window.db, "likes"), where("from", "==", window.currentUser.id));
+            const likesSnap = await getDocs(likesQ);
+            const interactedIds = likesSnap.docs.map(d => d.data().to);
+
+            window.profiles = allUsers.filter(u => !interactedIds.includes(u.id));
+            window.currentProfileIndex = 0;
+            renderCurrentProfile();
+        } catch (e) {
+            console.error(e);
+            $('card-container').innerHTML = '<div class="empty-state">Erro ao carregar perfis.</div>';
+        }
+    }
+
+    function renderCurrentProfile() {
+        const container = $('card-container');
+        if (window.currentProfileIndex >= window.profiles.length) {
+            container.innerHTML = `<div class="empty-state">
+                <h3>Acabou!</h3><p>Não há mais perfis na sua região.</p>
+                <button class="secondary-btn" onclick="loadProfiles()">Atualizar</button>
+            </div>`;
+            return;
+        }
+
+        const profile = window.profiles[window.currentProfileIndex];
+        const tagsHtml = profile.interesses ? profile.interesses.map(t => `<span class="tag">${t}</span>`).join('') : '';
+
+        container.innerHTML = `
+            <div class="profile-card">
+                <img src="${profile.foto}" alt="Foto" onerror="this.src='https://via.placeholder.com/300x400?text=Sem+Foto'">
+                <div class="profile-info">
+                    <h2>${profile.nome}</h2>
+                    <p><strong>Turma:</strong> ${profile.turma} | <strong>Curso:</strong> ${profile.curso || 'N/A'}</p>
+                    <div class="tags">${tagsHtml}</div>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="action-btn btn-pass" onclick="handleSwipe(false)">✖</button>
+                <button class="action-btn btn-like" onclick="handleSwipe(true)">♥</button>
+            </div>
+        `;
+    }
+
+    window.handleSwipe = async (liked) => {
+        const targetProfile = window.profiles[window.currentProfileIndex];
+        
+        // Registra a interação
+        try {
+            await addDoc(collection(window.db, "likes"), {
+                from: window.currentUser.id,
+                to: targetProfile.id,
+                liked: liked,
+                timestamp: serverTimestamp()
+            });
+
+            if (liked) {
+                // Checa se deu match (o outro me deu like?)
+                const matchQ = query(collection(window.db, "likes"), 
+                    where("from", "==", targetProfile.id), 
+                    where("to", "==", window.currentUser.id),
+                    where("liked", "==", true));
+                const matchSnap = await getDocs(matchQ);
+                
+                if (!matchSnap.empty) {
+                    alert(`🎉 DEU MATCH COM ${targetProfile.nome.toUpperCase()}!`);
+                    // Cria a sala de chat
+                    const chatId = [window.currentUser.id, targetProfile.id].sort().join('_');
+                    await setDoc(doc(window.db, "matches", chatId), {
+                        users: [window.currentUser.id, targetProfile.id],
+                        userInfo: {
+                            [window.currentUser.id]: { nome: window.currentUser.nome, foto: window.currentUser.foto },
+                            [targetProfile.id]: { nome: targetProfile.nome, foto: targetProfile.foto }
+                        },
+                        timestamp: serverTimestamp()
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("Erro no swipe", e);
+        }
+
+        window.currentProfileIndex++;
+        renderCurrentProfile();
+    };
+
+    // --- MATCHES & CHAT ---
+    async function loadMatches() {
+        $('matches-list').innerHTML = '<div class="empty-state">Carregando matches...</div>';
+        try {
+            const q = query(collection(window.db, "matches"), where("users", "array-contains", window.currentUser.id));
+            const snapshot = await getDocs(q);
+            
+            if (snapshot.empty) {
+                $('matches-list').innerHTML = '<div class="empty-state">Nenhum match ainda. Continue descobrindo!</div>';
+                return;
+            }
+
+            let html = '';
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                const otherUserId = data.users.find(id => id !== window.currentUser.id);
+                const otherUser = data.userInfo[otherUserId];
+                html += `
+                    <div class="match-item" onclick="openChat('${docSnap.id}', '${otherUser.nome}')">
+                        <img src="${otherUser.foto}" class="match-avatar" onerror="this.src='https://via.placeholder.com/50'">
+                        <div class="match-info">
+                            <h4>${otherUser.nome}</h4>
+                            <p>Toque para abrir o chat</p>
+                        </div>
+                    </div>
+                `;
+            });
+            $('matches-list').innerHTML = html;
+        } catch (e) {
+            console.error(e);
+            $('matches-list').innerHTML = '<div class="empty-state">Erro ao carregar matches.</div>';
+        }
+    }
+
+    window.openChat = (chatId, otherName) => {
+        window.activeChatId = chatId;
+        $('chat-title').textContent = otherName;
+        $('matches-screen').classList.remove('active');
+        $('chat-screen').classList.add('active');
+        $('chat-messages').innerHTML = '';
+        
+        // Listener em tempo real
+        const q = query(collection(window.db, "messages"), where("chatId", "==", chatId), orderBy("createdAt", "asc"));
+        window.chatUnsubscribe = onSnapshot(q, (snapshot) => {
+            const container = $('chat-messages');
+            container.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const msg = docSnap.data();
+                const isMe = msg.from === window.currentUser.id;
+                container.innerHTML += `<div class="message ${isMe ? 'sent' : 'received'}">${msg.text}</div>`;
+            });
+            container.scrollTop = container.scrollHeight;
+        });
+    };
+
+    window.closeChat = () => {
+        if (window.chatUnsubscribe) window.chatUnsubscribe();
+        window.activeChatId = null;
+        $('chat-screen').classList.remove('active');
+        $('matches-screen').classList.add('active');
+    };
+
+    window.sendMessage = async () => {
+        const input = $('chat-input');
+        const text = input.value.trim();
+        if (!text || !window.activeChatId) return;
+        
+        input.value = '';
+        try {
+            await addDoc(collection(window.db, "messages"), {
+                chatId: window.activeChatId,
+                from: window.currentUser.id,
+                text: text,
+                createdAt: serverTimestamp()
+            });
+        } catch (e) {
+            console.error("Erro ao enviar mensagem", e);
+            alert("Erro ao enviar mensagem.");
+        }
+    };
+
+    window.handleChatEnter = (e) => {
+        if (e.key === 'Enter') window.sendMessage();
+    };
+</script>
+
+</body>
+</html>
