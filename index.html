@@ -223,7 +223,7 @@
 <script type="module">
     // --- FIREBASE IMPORTS (V10 CDN) ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where, onSnapshot, serverTimestamp, setDoc, doc, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, onSnapshot, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
     // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
@@ -309,7 +309,7 @@
         if(senha !== GLOBAL_PASSWORD) return showAlert('auth-alert', 'Senha de acesso inválida!', 'error');
         if(!nome || !turma || !foto) return showAlert('auth-alert', 'Preencha os campos obrigatórios.', 'error');
 
-        $('rules-modal').classList.add('active'); // Mostra regras antes de salvar
+        $('rules-modal').classList.add('active');
     };
 
     window.acceptRules = async () => {
@@ -366,14 +366,11 @@
     async function loadProfiles() {
         $('card-container').innerHTML = '<div class="empty-state">Buscando perfis...</div>';
         try {
-            // Pega todos (em prod, limite isso. Aqui é didático)
             const snapshot = await getDocs(collection(window.db, "users"));
             let allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
-            // Filtra o próprio usuário
             allUsers = allUsers.filter(u => u.id !== window.currentUser.id);
 
-            // Busca os que eu já dei like/pass (Simulando buscando da tabela likes onde from = myId)
             const likesQ = query(collection(window.db, "likes"), where("from", "==", window.currentUser.id));
             const likesSnap = await getDocs(likesQ);
             const interactedIds = likesSnap.docs.map(d => d.data().to);
@@ -419,7 +416,6 @@
     window.handleSwipe = async (liked) => {
         const targetProfile = window.profiles[window.currentProfileIndex];
         
-        // Registra a interação
         try {
             await addDoc(collection(window.db, "likes"), {
                 from: window.currentUser.id,
@@ -429,7 +425,6 @@
             });
 
             if (liked) {
-                // Checa se deu match (o outro me deu like?)
                 const matchQ = query(collection(window.db, "likes"), 
                     where("from", "==", targetProfile.id), 
                     where("to", "==", window.currentUser.id),
@@ -438,7 +433,6 @@
                 
                 if (!matchSnap.empty) {
                     alert(`🎉 DEU MATCH COM ${targetProfile.nome.toUpperCase()}!`);
-                    // Cria a sala de chat
                     const chatId = [window.currentUser.id, targetProfile.id].sort().join('_');
                     await setDoc(doc(window.db, "matches", chatId), {
                         users: [window.currentUser.id, targetProfile.id],
@@ -492,6 +486,7 @@
         }
     }
 
+    // Função openChat com a correção de ordenação no Javascript!
     window.openChat = (chatId, otherName) => {
         window.activeChatId = chatId;
         $('chat-title').textContent = otherName;
@@ -499,13 +494,23 @@
         $('chat-screen').classList.add('active');
         $('chat-messages').innerHTML = '';
         
-        // Listener em tempo real
-        const q = query(collection(window.db, "messages"), where("chatId", "==", chatId), orderBy("createdAt", "asc"));
+        const q = query(collection(window.db, "messages"), where("chatId", "==", chatId));
+        
         window.chatUnsubscribe = onSnapshot(q, (snapshot) => {
             const container = $('chat-messages');
             container.innerHTML = '';
-            snapshot.forEach(docSnap => {
-                const msg = docSnap.data();
+            
+            let mensagens = [];
+            snapshot.forEach(docSnap => mensagens.push(docSnap.data()));
+            
+            // Ordena localmente para evitar erro de Index no Firebase
+            mensagens.sort((a, b) => {
+                const tempoA = a.createdAt ? a.createdAt.toMillis() : Date.now();
+                const tempoB = b.createdAt ? b.createdAt.toMillis() : Date.now();
+                return tempoA - tempoB;
+            });
+
+            mensagens.forEach(msg => {
                 const isMe = msg.from === window.currentUser.id;
                 container.innerHTML += `<div class="message ${isMe ? 'sent' : 'received'}">${msg.text}</div>`;
             });
