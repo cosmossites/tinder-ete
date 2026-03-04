@@ -3,229 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tinder ETE — FAETEC</title>
+    <title>Conecta ETE — FAETEC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --faetec-blue: #00478F;
-            --faetec-light-blue: #0066CC;
-            --bg-color: #f4f4f9;
-            --text-main: #333;
-            --text-muted: #666;
-            --danger: #dc3545;
-            --success: #28a745;
-            --white: #ffffff;
-            --border: #e0e0e0;
+            --primary: #0056b3;
+            --primary-dark: #003d82;
+            --primary-gradient: linear-gradient(135deg, #0056b3 0%, #007bff 100%);
+            --bg-color: #f3f4f6;
+            --surface: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --danger: #ef4444;
+            --success: #10b981;
+            --border: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background-color: #e9ecef;
+            background-color: #e5e7eb;
             display: flex;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             color: var(--text-main);
         }
 
         #app {
             width: 100%;
-            max-width: 480px;
-            background: var(--white);
+            max-width: 420px;
+            background: var(--bg-color);
             height: 100vh;
             position: relative;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-xl);
         }
 
-        /* Headers */
+        @media (min-width: 421px) {
+            #app { height: 95vh; border-radius: 24px; }
+        }
+
+        /* Header Atualizado com Botão de Regras */
         header {
-            background: var(--faetec-blue);
-            color: var(--white);
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
+            background: var(--surface);
+            color: var(--primary);
+            padding: 15px 20px;
+            font-size: 1.4rem;
+            font-weight: 700;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             z-index: 10;
+            border-bottom: 1px solid var(--border);
+            letter-spacing: -0.5px;
         }
 
-        /* Screens */
-        .screen {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            overflow-y: auto;
-            background: var(--bg-color);
+        .header-btn {
+            background: rgba(0, 86, 179, 0.08);
+            border: none;
+            color: var(--primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+        .header-btn:hover { background: rgba(0, 86, 179, 0.15); }
+
+        /* Screens */
+        .screen { display: none; flex: 1; flex-direction: column; overflow-y: auto; background: var(--bg-color); }
         .screen.active { display: flex; }
 
         /* Forms & Inputs */
-        .form-container { padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
-        input[type="text"], input[type="password"], input[type="url"], textarea {
-            width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;
+        .form-container { padding: 30px 24px; display: flex; flex-direction: column; justify-content: center; min-height: 100%; }
+        .form-title { text-align: center; color: var(--text-main); font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+        .form-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
+        
+        .form-group { margin-bottom: 20px; }
+        label.input-label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-main); }
+        input[type="text"], input[type="password"] {
+            width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; 
+            font-size: 1rem; background: var(--surface); transition: all 0.2s; color: var(--text-main);
         }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(0, 86, 179, 0.1); }
+
+        /* DESIGN PREMIUM DO UPLOAD DE FOTO */
+        .file-upload-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 30px; border: 2px dashed var(--primary); border-radius: 16px;
+            background-color: rgba(0, 86, 179, 0.03); cursor: pointer; transition: all 0.3s ease;
+            text-align: center; position: relative; overflow: hidden; min-height: 160px;
+        }
+        .file-upload-box:hover { background-color: rgba(0, 86, 179, 0.08); border-color: var(--primary-dark); }
+        .file-upload-box img.preview {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 1; border-radius: 14px;
+        }
+        .file-upload-box .upload-content {
+            z-index: 2; display: flex; flex-direction: column; align-items: center; transition: all 0.3s;
+        }
+        .file-upload-box.has-image .upload-content {
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            padding: 8px 16px; border-radius: 20px;
+        }
+        .upload-icon { font-size: 2.2rem; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .upload-text { font-size: 0.95rem; font-weight: 600; color: var(--primary); }
+        .file-upload-box.has-image .upload-text { color: white; font-size: 0.85rem; }
+        .file-upload-box.has-image .upload-icon { display: none; }
+
         button.primary-btn {
-            width: 100%; background: var(--faetec-blue); color: var(--white); border: none; padding: 12px;
-            border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.3s;
+            width: 100%; background: var(--primary-gradient); color: var(--white); border: none; padding: 16px;
+            border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: transform 0.1s, opacity 0.2s;
+            box-shadow: var(--shadow-md); margin-top: 10px;
         }
-        button.primary-btn:hover { background: var(--faetec-light-blue); }
+        button.primary-btn:active { transform: scale(0.98); }
+        button.primary-btn:disabled { background: var(--text-muted); cursor: not-allowed; opacity: 0.7; }
+        
         button.secondary-btn {
-            width: 100%; background: transparent; color: var(--faetec-blue); border: 1px solid var(--faetec-blue);
-            padding: 12px; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 10px;
+            width: 100%; background: transparent; color: var(--primary); border: 1.5px solid var(--primary);
+            padding: 16px; border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; margin-top: 15px;
+            transition: background 0.2s;
         }
-        
+        button.secondary-btn:hover { background: rgba(0, 86, 179, 0.05); }
+
         /* Discover / Cards */
-        .card-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .card-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; position: relative;}
         .profile-card {
-            width: 100%; max-width: 350px; background: var(--white); border-radius: 15px; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;
+            width: 100%; max-width: 380px; height: 65vh; max-height: 600px; background: var(--surface); 
+            border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-xl); 
+            position: relative; transition: transform 0.3s ease;
         }
-        .profile-card img { width: 100%; height: 300px; object-fit: cover; }
-        .profile-info { padding: 15px; }
-        .profile-info h2 { font-size: 1.5rem; margin-bottom: 5px; }
-        .profile-info p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px; }
-        .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 10px; }
-        .tag { background: #e0eaf5; color: var(--faetec-blue); padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; }
+        .profile-card img { width: 100%; height: 100%; object-fit: cover; }
         
-        .actions { display: flex; justify-content: center; gap: 20px; padding: 20px; width: 100%; max-width: 350px;}
-        .action-btn {
-            width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 1.5rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        .profile-info {
+            position: absolute; bottom: 0; left: 0; right: 0; padding: 30px 20px 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+            color: white; text-align: left;
         }
-        .btn-pass { background: var(--white); color: var(--danger); border: 2px solid var(--danger); }
-        .btn-like { background: var(--white); color: var(--success); border: 2px solid var(--success); }
-        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; }
+        .profile-info h2 { font-size: 2rem; font-weight: 700; margin-bottom: 4px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .profile-info p { font-size: 1rem; opacity: 0.9; margin-bottom: 12px; font-weight: 500;}
+        
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.3); 
+               color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px;}
+        
+        .actions { display: flex; justify-content: center; gap: 30px; padding: 25px 0; width: 100%; }
+        .action-btn {
+            width: 70px; height: 70px; border-radius: 50%; border: none; font-size: 2rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: var(--shadow-md); transition: transform 0.2s; background: var(--surface);
+        }
+        .action-btn:active { transform: scale(0.9); }
+        .btn-pass { color: var(--danger); border: 2px solid transparent; }
+        .btn-pass:hover { border-color: var(--danger); color: var(--danger); background: #fef2f2;}
+        .btn-like { color: var(--success); border: 2px solid transparent; }
+        .btn-like:hover { border-color: var(--success); color: var(--success); background: #ecfdf5;}
+        
+        .empty-state { text-align: center; color: var(--text-muted); padding: 40px 20px; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .empty-state h3 { font-size: 1.5rem; color: var(--text-main); margin-bottom: 10px; }
 
         /* Matches List */
+        #matches-list { padding: 10px; }
         .match-item {
-            display: flex; align-items: center; padding: 15px; border-bottom: 1px solid var(--border);
-            background: var(--white); cursor: pointer; transition: background 0.2s;
+            display: flex; align-items: center; padding: 16px; margin-bottom: 10px; border-radius: 16px;
+            background: var(--surface); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border);
         }
-        .match-item:hover { background: #f8f9fa; }
-        .match-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; }
-        .match-info h4 { margin: 0; font-size: 1.1rem; }
-        .match-info p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+        .match-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .match-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 16px; border: 2px solid var(--primary); padding: 2px; }
+        .match-info h4 { margin: 0 0 4px 0; font-size: 1.15rem; color: var(--text-main); font-weight: 700; }
+        .match-info p { margin: 0; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
 
-        /* Chat */
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { max-width: 75%; padding: 10px 15px; border-radius: 15px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; }
-        .message.sent { background: var(--faetec-blue); color: var(--white); align-self: flex-end; border-bottom-right-radius: 5px; }
-        .message.received { background: #e9ecef; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 5px; }
-        .chat-input-area { display: flex; padding: 10px; background: var(--white); border-top: 1px solid var(--border); }
-        .chat-input-area input { flex: 1; border: none; background: #f1f1f1; padding: 12px; border-radius: 20px; outline: none; }
-        .chat-input-area button { background: transparent; border: none; color: var(--faetec-blue); font-weight: bold; padding: 0 15px; cursor: pointer; }
+        /* Chat Moderno */
+        .chat-header {
+            background: var(--surface); color: var(--text-main); padding: 16px; display: flex; align-items: center;
+            border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 5;
+        }
+        .chat-back { background: none; border: none; font-size: 1.5rem; color: var(--primary); margin-right: 15px; cursor: pointer; padding: 5px; }
+        #chat-title { font-weight: 700; font-size: 1.2rem; }
+        
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #efeae2; }
+        .message { max-width: 80%; padding: 12px 16px; font-size: 0.95rem; line-height: 1.5; word-wrap: break-word; font-weight: 500; box-shadow: var(--shadow-sm);}
+        .message.sent { 
+            background: var(--primary); color: white; align-self: flex-end; 
+            border-radius: 18px 18px 4px 18px; 
+        }
+        .message.received { 
+            background: var(--surface); color: var(--text-main); align-self: flex-start; 
+            border-radius: 18px 18px 18px 4px; 
+        }
+        
+        .chat-input-area { display: flex; padding: 16px; background: var(--surface); border-top: 1px solid var(--border); align-items: center; gap: 10px;}
+        .chat-input-area input { flex: 1; border: 1px solid var(--border); background: var(--bg-color); padding: 14px 20px; border-radius: 24px; outline: none; font-size: 1rem; transition: border 0.2s;}
+        .chat-input-area input:focus { border-color: var(--primary); }
+        .chat-input-area button { background: var(--primary); border: none; color: white; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s;}
+        .chat-input-area button:active { transform: scale(0.9); }
 
         /* Navigation Bottom */
         .bottom-nav {
-            display: flex; justify-content: space-around; background: var(--white); border-top: 1px solid var(--border); padding: 10px 0;
+            display: flex; justify-content: space-around; background: var(--surface); border-top: 1px solid var(--border); padding: 5px 0 15px 0; z-index: 10;
         }
-        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; padding: 10px; flex: 1; font-weight: bold; }
-        .nav-item.active { color: var(--faetec-blue); border-bottom: 3px solid var(--faetec-blue); }
+        .nav-item { background: none; border: none; color: var(--text-muted); font-size: 0.9rem; cursor: pointer; padding: 10px; flex: 1; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 0.2s;}
+        .nav-icon { font-size: 1.4rem; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active .nav-icon { transform: scale(1.1); }
 
         /* Modals */
         .modal {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
             display: none; justify-content: center; align-items: center; z-index: 100;
         }
         .modal.active { display: flex; }
-        .modal-content { background: var(--white); padding: 25px; border-radius: 15px; width: 90%; max-height: 90%; overflow-y: auto; }
+        .modal-content { background: var(--surface); padding: 30px; border-radius: 24px; width: 90%; max-width: 360px; max-height: 90%; overflow-y: auto; box-shadow: var(--shadow-xl); }
+        .modal-content h2 { text-align: center; margin-bottom: 15px; color: var(--text-main); }
         
-        .alert { padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; display: none; }
-        .alert.error { background: #f8d7da; color: #721c24; display: block; }
-        .alert.success { background: #d4edda; color: #155724; display: block; }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; font-weight: 600; font-size: 0.9rem;}
+        .alert.error { background: #fef2f2; color: #b91c1c; border: 1px solid #f87171; display: block; }
+        .alert.success { background: #ecfdf5; color: #047857; border: 1px solid #34d399; display: block; }
     </style>
 </head>
 <body>
 
 <div id="app">
     <header>
-        <span id="header-title">Tinder ETE</span>
+        <span id="header-title">Conecta ETE</span>
+        <button class="header-btn" onclick="openRulesModalOnly()">📋 Regras</button>
     </header>
 
     <div id="rules-modal" class="modal">
         <div class="modal-content">
-            <h2>Regras de Convivência</h2>
-            <ul style="margin: 15px 0; padding-left: 20px; font-size: 0.9rem; color: var(--text-muted);">
-                <li>Respeito mútuo é inegociável.</li>
+            <h2>Termos e Regras</h2>
+            <ul style="margin: 15px 0; padding-left: 20px; font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+                <li><strong>Respeito mútuo</strong> é inegociável.</li>
                 <li>Zero tolerância a assédio ou bullying.</li>
-                <li>Proibido conteúdo sexual explícito.</li>
+                <li>Mantenha um comportamento profissional e acadêmico.</li>
                 <li>Não compartilhe dados sensíveis (CPF, endereço).</li>
-                <li>Aviso: Este app foi feito para fins acadêmicos. Seus dados básicos são visíveis na rede.</li>
+                <li><em>Aviso: Este app foi feito para fins acadêmicos. Seus dados básicos são visíveis na rede.</em></li>
             </ul>
-            <button class="primary-btn" onclick="acceptRules()">Ao continuar, eu concordo</button>
+            <button class="primary-btn" id="btn-accept-rules" style="display: none;" onclick="acceptRules()">Concordar e Continuar</button>
+            <button class="secondary-btn" id="btn-close-rules" style="display: none; margin-top: 0;" onclick="closeRules()">Fechar</button>
         </div>
     </div>
 
     <div id="auth-screen" class="screen active">
         <div class="form-container">
-            <h2 style="text-align: center; color: var(--faetec-blue); margin-bottom: 20px;">Bem-vindo</h2>
+            <h1 class="form-title">Bem-vindo(a)</h1>
+            <p class="form-subtitle">Conecte-se com alunos da FAETEC</p>
+            
             <div id="auth-alert" class="alert"></div>
             
             <div id="login-form">
-                <div class="form-group"><label>Seu Nome (Login)</label><input type="text" id="login-nome"></div>
-                <div class="form-group"><label>Senha de Acesso</label><input type="password" id="login-senha" placeholder="etectinder"></div>
-                <button class="primary-btn" onclick="login()">Entrar</button>
-                <button class="secondary-btn" onclick="toggleAuthMode()">Não tem conta? Criar</button>
+                <div class="form-group">
+                    <label class="input-label">Seu Nome (Login)</label>
+                    <input type="text" id="login-nome" placeholder="Digite seu nome cadastrado" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="input-label">Senha de Acesso</label>
+                    <input type="password" id="login-senha" placeholder="eteconecta" autocomplete="new-password">
+                </div>
+                <button class="primary-btn" onclick="login()">Entrar no app</button>
+                <button class="secondary-btn" onclick="toggleAuthMode()">Criar nova conta</button>
             </div>
 
             <div id="register-form" style="display: none;">
-                <div class="form-group"><label>Nome</label><input type="text" id="reg-nome"></div>
-                <div class="form-group"><label>Turma (ex: 1301)</label><input type="text" id="reg-turma"></div>
-                <div class="form-group"><label>Curso</label><input type="text" id="reg-curso" placeholder="Informática"></div>
-                <div class="form-group"><label>Interesses (separados por vírgula)</label><input type="text" id="reg-interesses" placeholder="Música, Jogos, Programação"></div>
-                <div class="form-group"><label>URL da Foto de Perfil</label><input type="url" id="reg-foto" placeholder="https://link-da-imagem.com/foto.jpg"></div>
-                <div class="form-group"><label>Senha de Acesso</label><input type="password" id="reg-senha" placeholder="etectinder"></div>
-                <p style="font-size: 0.75rem; color: var(--danger); margin-bottom: 10px;">Aviso: Autenticação simplificada. Não use dados confidenciais.</p>
-                <button class="primary-btn" onclick="register()">Criar Conta</button>
-                <button class="secondary-btn" onclick="toggleAuthMode()">Já tenho conta</button>
+                <div class="form-group"><label class="input-label">Nome Completo</label><input type="text" id="reg-nome" placeholder="Ex: João Silva" autocomplete="off"></div>
+                <div class="form-group"><label class="input-label">Turma</label><input type="text" id="reg-turma" placeholder="Ex: 1301" autocomplete="off"></div>
+                <div class="form-group"><label class="input-label">Curso</label><input type="text" id="reg-curso" placeholder="Ex: Informática" autocomplete="off"></div>
+                <div class="form-group"><label class="input-label">Interesses</label><input type="text" id="reg-interesses" placeholder="Séries, Jogos, Esportes (separados por vírgula)" autocomplete="off"></div>
+                
+                <div class="form-group">
+                    <label class="input-label">Foto de Perfil</label>
+                    <input type="file" id="reg-foto" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                    <label for="reg-foto" class="file-upload-box" id="upload-box">
+                        <div class="upload-content">
+                            <span class="upload-icon">📸</span>
+                            <span class="upload-text" id="upload-text">Toque para escolher da galeria</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-group"><label class="input-label">Senha de Acesso Global</label><input type="password" id="reg-senha" placeholder="eteconecta" autocomplete="new-password"></div>
+                <button class="primary-btn" onclick="register()">Finalizar Cadastro</button>
+                <button class="secondary-btn" onclick="toggleAuthMode()">Já tenho uma conta</button>
             </div>
         </div>
     </div>
 
     <div id="swipe-screen" class="screen">
         <div class="card-container" id="card-container">
-            <div class="empty-state">Buscando perfis...</div>
+            <div class="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); opacity: 0.5; margin-bottom: 15px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <h3>Buscando perfis...</h3>
+            </div>
         </div>
     </div>
 
     <div id="matches-screen" class="screen">
+        <div style="padding: 20px 20px 10px; font-weight: 700; font-size: 1.4rem; color: var(--primary);">Suas Conexões</div>
         <div id="matches-list">
-            <div class="empty-state">Carregando matches...</div>
+            <div class="empty-state">Carregando conexões...</div>
         </div>
     </div>
 
     <div id="chat-screen" class="screen">
-        <div style="background: var(--faetec-light-blue); color: white; padding: 10px; display: flex; align-items: center;">
-            <button onclick="closeChat()" style="background:none;border:none;color:white;font-size:1.2rem;margin-right:10px;cursor:pointer;">←</button>
-            <h3 id="chat-title">Nome do Match</h3>
+        <div class="chat-header">
+            <button class="chat-back" onclick="closeChat()">❮</button>
+            <span id="chat-title">Conexão</span>
         </div>
         <div class="chat-messages" id="chat-messages">
             </div>
         <div class="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Digite uma mensagem..." onkeypress="handleChatEnter(event)">
-            <button onclick="sendMessage()">Enviar</button>
+            <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." onkeypress="handleChatEnter(event)" autocomplete="off">
+            <button onclick="sendMessage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
         </div>
     </div>
 
     <div class="bottom-nav" id="bottom-nav" style="display: none;">
-        <button class="nav-item active" onclick="switchTab('swipe')">Descobrir</button>
-        <button class="nav-item" onclick="switchTab('matches')">Matches & Chat</button>
-        <button class="nav-item" onclick="logout()">Sair</button>
+        <button class="nav-item active" onclick="switchTab('swipe')">
+            <span class="nav-icon">👥</span>
+            <span>Descobrir</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('matches')">
+            <span class="nav-icon">💬</span>
+            <span>Conexões</span>
+        </button>
+        <button class="nav-item" onclick="logout()">
+            <span class="nav-icon">🚪</span>
+            <span>Sair</span>
+        </button>
     </div>
 </div>
 
 <script type="module">
-    // --- FIREBASE IMPORTS (V10 CDN) ---
+    // --- FIREBASE IMPORTS ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, where, onSnapshot, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // --- CONFIGURAÇÃO FIREBASE ---
+    // --- CONFIGURAÇÃO FIREBASE (NÃO ALTERE ISSO PARA NÃO QUEBRAR O BANCO) ---
     const firebaseConfig = {
         apiKey: "AIzaSyBenjJjuU_Z4_y1FZcN95duKf3Xgv0hkE4",
         authDomain: "tinder-ete.firebaseapp.com",
@@ -236,7 +363,7 @@
     };
 
     // --- GLOBAL STATE ---
-    const GLOBAL_PASSWORD = "etectinder";
+    const GLOBAL_PASSWORD = "eteconecta";
     window.db = null;
     window.currentUser = null;
     window.profiles = [];
@@ -244,7 +371,6 @@
     window.activeChatId = null;
     window.chatUnsubscribe = null;
 
-    // --- INITIALIZATION ---
     window.onload = () => {
         try {
             const app = initializeApp(firebaseConfig);
@@ -256,22 +382,95 @@
         }
     };
 
-    // --- UI HELPERS ---
     const $ = id => document.getElementById(id);
     const showAlert = (id, msg, type) => {
         const el = $(id); el.textContent = msg; el.className = `alert ${type}`;
-        setTimeout(() => el.style.display = 'none', 3000);
+        setTimeout(() => el.style.display = 'none', 4000);
     };
     
+    // Funções para gerenciar o Modal de Regras
+    window.openRulesModalOnly = () => {
+        $('btn-accept-rules').style.display = 'none'; // Esconde botão de cadastro
+        $('btn-close-rules').style.display = 'block'; // Mostra botão de fechar
+        $('rules-modal').classList.add('active');
+    };
+
+    window.closeRules = () => {
+        $('rules-modal').classList.remove('active');
+    };
+
+    window.previewImage = (event) => {
+        const file = event.target.files[0];
+        const box = $('upload-box');
+        const text = $('upload-text');
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const existingImg = box.querySelector('img.preview');
+                if(existingImg) existingImg.remove();
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'preview';
+                box.appendChild(img);
+                
+                box.classList.add('has-image');
+                text.textContent = "Toque para trocar a foto";
+            }
+            reader.readAsDataURL(file);
+        }
+    };
+
+    function resetImagePreview() {
+        $('reg-foto').value = '';
+        const box = $('upload-box');
+        if(box) {
+            box.classList.remove('has-image');
+            const existingImg = box.querySelector('img.preview');
+            if(existingImg) existingImg.remove();
+            $('upload-text').textContent = "Toque para escolher da galeria";
+        }
+    }
+
     window.toggleAuthMode = () => {
         const isLogin = $('login-form').style.display !== 'none';
         $('login-form').style.display = isLogin ? 'none' : 'block';
         $('register-form').style.display = isLogin ? 'block' : 'none';
+        $('auth-alert').style.display = 'none';
+        resetImagePreview();
     };
 
-    // --- AUTH (FAKE AUTH) ---
+    function compressImageToBase64(file, callback) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 400;
+                const MAX_HEIGHT = 400;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                } else {
+                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7); 
+                callback(dataUrl);
+            }
+            img.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
     function checkSession() {
-        const userStr = localStorage.getItem('tinder_user');
+        const userStr = localStorage.getItem('ete_app_user');
         if (userStr) {
             window.currentUser = JSON.parse(userStr);
             showMainApp();
@@ -281,70 +480,88 @@
     window.login = async () => {
         const nome = $('login-nome').value.trim();
         const senha = $('login-senha').value;
-        if(senha !== GLOBAL_PASSWORD) return showAlert('auth-alert', 'Senha inválida!', 'error');
-        if(!nome) return showAlert('auth-alert', 'Digite seu nome.', 'error');
+        if(senha !== GLOBAL_PASSWORD) return showAlert('auth-alert', 'Senha de acesso incorreta.', 'error');
+        if(!nome) return showAlert('auth-alert', 'Por favor, digite seu nome.', 'error');
 
         try {
             const q = query(collection(window.db, "users"), where("nome", "==", nome));
             const snapshot = await getDocs(q);
-            if (snapshot.empty) return showAlert('auth-alert', 'Usuário não encontrado.', 'error');
+            if (snapshot.empty) return showAlert('auth-alert', 'Perfil não encontrado. Verifique o nome.', 'error');
             
             window.currentUser = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-            localStorage.setItem('tinder_user', JSON.stringify(window.currentUser));
+            localStorage.setItem('ete_app_user', JSON.stringify(window.currentUser));
             showMainApp();
         } catch (e) {
             console.error(e);
-            showAlert('auth-alert', 'Erro ao logar. Verifique as permissões do Firestore.', 'error');
+            showAlert('auth-alert', 'Erro ao logar. Tente novamente.', 'error');
         }
     };
 
     window.register = async () => {
         const nome = $('reg-nome').value.trim();
         const turma = $('reg-turma').value.trim();
-        const curso = $('reg-curso').value.trim();
-        const interesses = $('reg-interesses').value.trim();
-        const foto = $('reg-foto').value.trim();
         const senha = $('reg-senha').value;
+        const fotoInput = $('reg-foto');
 
         if(senha !== GLOBAL_PASSWORD) return showAlert('auth-alert', 'Senha de acesso inválida!', 'error');
-        if(!nome || !turma || !foto) return showAlert('auth-alert', 'Preencha os campos obrigatórios.', 'error');
+        if(!nome || !turma) return showAlert('auth-alert', 'Nome e Turma são obrigatórios.', 'error');
+        if(fotoInput.files.length === 0) return showAlert('auth-alert', 'Sua foto de perfil é obrigatória!', 'error');
 
+        // Prepara o modal para modo de aceite (Cadastro)
+        $('btn-close-rules').style.display = 'none';
+        $('btn-accept-rules').style.display = 'block';
         $('rules-modal').classList.add('active');
     };
 
     window.acceptRules = async () => {
-        $('rules-modal').classList.remove('active');
-        const userData = {
-            nome: $('reg-nome').value.trim(),
-            turma: $('reg-turma').value.trim(),
-            curso: $('reg-curso').value.trim(),
-            interesses: $('reg-interesses').value.trim().split(',').map(i => i.trim()),
-            foto: $('reg-foto').value.trim(),
-            createdAt: serverTimestamp()
-        };
+        const btnAccept = $('btn-accept-rules');
+        btnAccept.textContent = "Processando perfil...";
+        btnAccept.disabled = true;
 
-        try {
-            const docRef = await addDoc(collection(window.db, "users"), userData);
-            window.currentUser = { id: docRef.id, ...userData };
-            localStorage.setItem('tinder_user', JSON.stringify(window.currentUser));
-            showMainApp();
-        } catch (e) {
-            console.error(e);
-            showAlert('auth-alert', 'Erro ao criar conta. Verifique Firestore.', 'error');
-        }
+        const fotoFile = $('reg-foto').files[0];
+
+        compressImageToBase64(fotoFile, async (base64Foto) => {
+            try {
+                const userData = {
+                    nome: $('reg-nome').value.trim(),
+                    turma: $('reg-turma').value.trim(),
+                    curso: $('reg-curso').value.trim(),
+                    interesses: $('reg-interesses').value.trim().split(',').map(i => i.trim()).filter(i => i),
+                    foto: base64Foto,
+                    createdAt: serverTimestamp()
+                };
+
+                const docRef = await addDoc(collection(window.db, "users"), userData);
+                window.currentUser = { id: docRef.id, ...userData };
+                localStorage.setItem('ete_app_user', JSON.stringify(window.currentUser));
+                
+                $('rules-modal').classList.remove('active');
+                btnAccept.textContent = "Concordar e Continuar";
+                btnAccept.disabled = false;
+                showMainApp();
+                resetImagePreview(); 
+                
+            } catch (e) {
+                console.error(e);
+                $('rules-modal').classList.remove('active');
+                btnAccept.textContent = "Concordar e Continuar";
+                btnAccept.disabled = false;
+                showAlert('auth-alert', 'Erro ao criar perfil. Tente uma foto mais leve.', 'error');
+            }
+        });
     };
 
     window.logout = () => {
-        localStorage.removeItem('tinder_user');
+        localStorage.removeItem('ete_app_user');
         window.currentUser = null;
         $('swipe-screen').classList.remove('active');
         $('matches-screen').classList.remove('active');
         $('chat-screen').classList.remove('active');
         $('bottom-nav').style.display = 'none';
         $('auth-screen').classList.add('active');
+        $('login-senha').value = '';
     };
 
-    // --- MAIN APP / NAVIGATION ---
     function showMainApp() {
         $('auth-screen').classList.remove('active');
         $('bottom-nav').style.display = 'flex';
@@ -356,15 +573,18 @@
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         
-        event && event.target.classList.add('active');
+        event && event.currentTarget.classList.add('active');
         $(`${tab}-screen`).classList.add('active');
         
         if(tab === 'matches') loadMatches();
     };
 
-    // --- SWIPE LOGIC ---
     async function loadProfiles() {
-        $('card-container').innerHTML = '<div class="empty-state">Buscando perfis...</div>';
+        $('card-container').innerHTML = `
+            <div class="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); opacity: 0.5; margin-bottom: 15px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <h3 style="color: var(--primary)">Buscando perfis...</h3>
+            </div>`;
         try {
             const snapshot = await getDocs(collection(window.db, "users"));
             let allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -380,41 +600,52 @@
             renderCurrentProfile();
         } catch (e) {
             console.error(e);
-            $('card-container').innerHTML = '<div class="empty-state">Erro ao carregar perfis.</div>';
+            $('card-container').innerHTML = '<div class="empty-state"><h3>Erro de conexão</h3><button class="secondary-btn" onclick="loadProfiles()">Tentar novamente</button></div>';
         }
     }
 
     function renderCurrentProfile() {
         const container = $('card-container');
         if (window.currentProfileIndex >= window.profiles.length) {
-            container.innerHTML = `<div class="empty-state">
-                <h3>Acabou!</h3><p>Não há mais perfis na sua região.</p>
-                <button class="secondary-btn" onclick="loadProfiles()">Atualizar</button>
-            </div>`;
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🎓</div>
+                    <h3>Você zerou a ETE!</h3>
+                    <p style="font-size: 0.9rem;">Não há mais novos colegas na sua rede no momento.</p>
+                    <button class="secondary-btn" style="max-width: 200px" onclick="loadProfiles()">Recarregar</button>
+                </div>`;
             return;
         }
 
         const profile = window.profiles[window.currentProfileIndex];
-        const tagsHtml = profile.interesses ? profile.interesses.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const tagsHtml = (profile.interesses && profile.interesses.length > 0) 
+            ? profile.interesses.map(t => `<span class="tag">${t}</span>`).join('') 
+            : '';
 
         container.innerHTML = `
-            <div class="profile-card">
-                <img src="${profile.foto}" alt="Foto" onerror="this.src='https://via.placeholder.com/300x400?text=Sem+Foto'">
+            <div class="profile-card" id="active-card">
+                <img src="${profile.foto}" alt="Foto do perfil" onerror="this.src='https://via.placeholder.com/400x600?text=Sem+Foto'">
                 <div class="profile-info">
-                    <h2>${profile.nome}</h2>
-                    <p><strong>Turma:</strong> ${profile.turma} | <strong>Curso:</strong> ${profile.curso || 'N/A'}</p>
+                    <h2>${profile.nome.split(' ')[0]}, <span style="font-weight: 400; font-size: 1.6rem">${profile.turma}</span></h2>
+                    <p>📚 ${profile.curso || 'Estudante'}</p>
                     <div class="tags">${tagsHtml}</div>
                 </div>
             </div>
             <div class="actions">
-                <button class="action-btn btn-pass" onclick="handleSwipe(false)">✖</button>
-                <button class="action-btn btn-like" onclick="handleSwipe(true)">♥</button>
+                <button class="action-btn btn-pass" onclick="handleSwipe(false)">❌</button>
+                <button class="action-btn btn-like" onclick="handleSwipe(true)">🤝</button>
             </div>
         `;
     }
 
     window.handleSwipe = async (liked) => {
         const targetProfile = window.profiles[window.currentProfileIndex];
+        const card = $('active-card');
+        
+        if(card) {
+            card.style.transform = liked ? 'translateX(120%) rotate(15deg)' : 'translateX(-120%) rotate(-15deg)';
+            card.style.opacity = '0';
+        }
         
         try {
             await addDoc(collection(window.db, "likes"), {
@@ -432,7 +663,7 @@
                 const matchSnap = await getDocs(matchQ);
                 
                 if (!matchSnap.empty) {
-                    alert(`🎉 DEU MATCH COM ${targetProfile.nome.toUpperCase()}!`);
+                    setTimeout(() => alert(`🎉 NOVA CONEXÃO COM ${targetProfile.nome.toUpperCase()}!`), 300);
                     const chatId = [window.currentUser.id, targetProfile.id].sort().join('_');
                     await setDoc(doc(window.db, "matches", chatId), {
                         users: [window.currentUser.id, targetProfile.id],
@@ -448,19 +679,25 @@
             console.error("Erro no swipe", e);
         }
 
-        window.currentProfileIndex++;
-        renderCurrentProfile();
+        setTimeout(() => {
+            window.currentProfileIndex++;
+            renderCurrentProfile();
+        }, 250);
     };
 
-    // --- MATCHES & CHAT ---
     async function loadMatches() {
-        $('matches-list').innerHTML = '<div class="empty-state">Carregando matches...</div>';
+        $('matches-list').innerHTML = '<div class="empty-state">Carregando...</div>';
         try {
             const q = query(collection(window.db, "matches"), where("users", "array-contains", window.currentUser.id));
             const snapshot = await getDocs(q);
             
             if (snapshot.empty) {
-                $('matches-list').innerHTML = '<div class="empty-state">Nenhum match ainda. Continue descobrindo!</div>';
+                $('matches-list').innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">👥</div>
+                        <h3>Nenhuma conexão ainda</h3>
+                        <p style="font-size: 0.9rem;">Continue interagindo para fazer novos contatos!</p>
+                    </div>`;
                 return;
             }
 
@@ -471,10 +708,10 @@
                 const otherUser = data.userInfo[otherUserId];
                 html += `
                     <div class="match-item" onclick="openChat('${docSnap.id}', '${otherUser.nome}')">
-                        <img src="${otherUser.foto}" class="match-avatar" onerror="this.src='https://via.placeholder.com/50'">
+                        <img src="${otherUser.foto}" class="match-avatar" onerror="this.src='https://via.placeholder.com/60'">
                         <div class="match-info">
                             <h4>${otherUser.nome}</h4>
-                            <p>Toque para abrir o chat</p>
+                            <p>Toque para abrir a conversa</p>
                         </div>
                     </div>
                 `;
@@ -482,14 +719,13 @@
             $('matches-list').innerHTML = html;
         } catch (e) {
             console.error(e);
-            $('matches-list').innerHTML = '<div class="empty-state">Erro ao carregar matches.</div>';
+            $('matches-list').innerHTML = '<div class="empty-state">Erro ao carregar conexões.</div>';
         }
     }
 
-    // Função openChat com a correção de ordenação no Javascript!
     window.openChat = (chatId, otherName) => {
         window.activeChatId = chatId;
-        $('chat-title').textContent = otherName;
+        $('chat-title').textContent = otherName.split(' ')[0];
         $('matches-screen').classList.remove('active');
         $('chat-screen').classList.add('active');
         $('chat-messages').innerHTML = '';
@@ -503,7 +739,6 @@
             let mensagens = [];
             snapshot.forEach(docSnap => mensagens.push(docSnap.data()));
             
-            // Ordena localmente para evitar erro de Index no Firebase
             mensagens.sort((a, b) => {
                 const tempoA = a.createdAt ? a.createdAt.toMillis() : Date.now();
                 const tempoB = b.createdAt ? b.createdAt.toMillis() : Date.now();
@@ -540,7 +775,7 @@
             });
         } catch (e) {
             console.error("Erro ao enviar mensagem", e);
-            alert("Erro ao enviar mensagem.");
+            alert("Erro de conexão ao enviar mensagem.");
         }
     };
 
