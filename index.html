@@ -71,7 +71,7 @@
         </div>
         <p class="brand-overline">Acesso ao sistema</p>
         <h1>Ação Solidária</h1>
-        <p class="brand-copy">Entre com sua conta, crie um acesso normal ou crie uma conta de dono com o código da igreja.</p>
+        <p class="brand-copy">Entre com sua conta, crie um acesso normal ou crie uma conta de Administrador com o código da igreja.</p>
       </div>
 
       <!-- Alerta usado caso o arquivo firebase-config.js não esteja configurado -->
@@ -81,11 +81,11 @@
 
       <!-- Formulário de login e criação de conta pelo Firebase Authentication -->
       <form id="login-form" class="login-form">
-        <!-- Botões para alternar entre entrar, criar conta normal e criar conta de dono -->
+        <!-- Botões para alternar entre entrar, criar conta normal e criar conta de Administrador -->
         <div class="auth-mode-switcher" role="group" aria-label="Escolha o tipo de acesso">
           <button class="auth-mode-button is-active" type="button" data-auth-mode="login">Entrar</button>
           <button class="auth-mode-button" type="button" data-auth-mode="register-normal">Pessoa normal</button>
-          <button class="auth-mode-button" type="button" data-auth-mode="register-admin">Dono</button>
+          <button class="auth-mode-button" type="button" data-auth-mode="register-admin">Administrador</button>
         </div>
 
         <label for="login-email">E-mail</label>
@@ -101,9 +101,9 @@
         </div>
 
         <div id="owner-code-field" class="owner-code-field" hidden>
-          <label for="owner-code">Código para criar conta de dono</label>
+          <label for="owner-code">Código para criar conta de Administrador</label>
           <input id="owner-code" name="ownerCode" type="password" autocomplete="off">
-          <p class="auth-help">O código libera somente a criação da conta de dono. Depois, o login usa a senha escolhida.</p>
+          <p class="auth-help">O código libera somente a criação da conta de Administrador. Depois, o login usa a senha escolhida.</p>
         </div>
 
         <p id="login-error" class="form-error" role="alert" hidden></p>
@@ -201,20 +201,13 @@
             <legend><span>01</span> Identificação</legend>
             <div class="form-grid">
               <label class="field">
-                <span>Paróquia *</span>
-                <select id="paroquia" required>
+                <span>Paróquia / Comunidade *</span>
+                <select id="paroquia-comunidade" required>
                   <option value="">Selecione</option>
                   <option>Paróquia Santa Edwiges</option>
                   <option>Paróquia Santa Cecília</option>
+                  <option>Amigos da Cruz</option>
                 </select>
-              </label>
-
-              <label class="field">
-                <span>Comunidade *</span>
-                <input id="comunidade" type="text" list="comunidades" placeholder="Comunidade Amigos da Cruz" required>
-                <datalist id="comunidades">
-                  <option value="Comunidade Amigos da Cruz"></option>
-                </datalist>
               </label>
 
               <label class="field">

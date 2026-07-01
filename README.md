@@ -3,7 +3,7 @@
 Site estático para GitHub Pages, feito com HTML, CSS e JavaScript puro. O sistema usa:
 
 - **Firebase Authentication** para criação de conta e login por e-mail e senha.
-- **Níveis de acesso no site**: pessoa normal e dono/administrador.
+- **Níveis de acesso no site**: pessoa normal e Administrador.
 - **Firebase Firestore** para armazenar os cadastros.
 - **Firestore Security Rules** para impedir acesso sem login no Firebase.
 - Sessão de autenticação limitada à aba do navegador.
@@ -71,24 +71,24 @@ O arquivo `firebase-config.js` pode ser publicado no GitHub Pages porque contém
 1. No Console do Firebase, abra **Authentication**.
 2. Clique em **Começar**.
 3. Em **Sign-in method**, ative **E-mail/senha**.
-4. O próprio site mostrará as opções **Entrar**, **Pessoa normal** e **Dono**.
+4. O próprio site mostrará as opções **Entrar**, **Pessoa normal** e **Administrador**.
 
 ## 4. Tipos de conta
 
 O sistema tem dois tipos de conta:
 
 - **Pessoa normal**: cria conta com e-mail e senha própria. Pode preencher e salvar fichas, mas não vê a consulta geral de cadastros, não edita cadastros salvos e não exclui registros.
-- **Dono/administrador**: cria conta com e-mail, senha própria e o código de dono. Pode cadastrar, consultar, editar, imprimir e excluir registros.
+- **Administrador**: cria conta com e-mail, senha própria e o código de Administrador. Pode cadastrar, consultar, editar, imprimir e excluir registros.
 
-O código para criar uma conta de dono é:
+O código para criar uma conta de Administrador é:
 
 ```text
 igreja120131
 ```
 
-Esse código é usado somente na criação da conta de dono. Depois que a conta existe, o login é feito com o e-mail e a senha escolhida pela própria pessoa.
+Esse código é usado somente na criação da conta de Administrador. Depois que a conta existe, o login é feito com o e-mail e a senha escolhida pela própria pessoa.
 
-**Atenção:** como este é um site estático, um código colocado no JavaScript pode ser visto por quem souber inspecionar os arquivos publicados. Para uso real com dados sensíveis, o mais seguro é liberar donos por aprovação manual, e-mails autorizados, custom claims do Firebase ou regras mais fortes no Firestore.
+**Atenção:** como este é um site estático, um código colocado no JavaScript pode ser visto por quem souber inspecionar os arquivos publicados. Para uso real com dados sensíveis, o mais seguro é liberar Administradores por aprovação manual, e-mails autorizados, custom claims do Firebase ou regras mais fortes no Firestore.
 
 ## 5. Criar o banco Firestore
 
@@ -115,7 +115,7 @@ service cloud.firestore {
 
 O mesmo conteúdo está no arquivo `firestore.rules`.
 
-**Atenção:** com essa regra, qualquer conta autenticada no Firebase poderá acessar tecnicamente a coleção no banco. A diferença entre pessoa normal e dono foi feita na interface do site para o projeto. Para segurança real, as regras do Firestore também precisam validar cargos/permissões no servidor.
+**Atenção:** com essa regra, qualquer conta autenticada no Firebase poderá acessar tecnicamente a coleção no banco. A diferença entre pessoa normal e Administrador foi feita na interface do site para o projeto. Para segurança real, as regras do Firestore também precisam validar cargos/permissões no servidor.
 
 ## 7. Testar localmente
 
@@ -137,8 +137,8 @@ Teste com:
 
 1. Criar uma conta de pessoa normal com uma senha própria.
 2. Confirmar que pessoa normal consegue salvar ficha, mas não vê a consulta geral.
-3. Criar uma conta de dono usando o código `igreja120131` e uma senha própria.
-4. Confirmar que dono consegue consultar, editar, imprimir e excluir cadastros.
+3. Criar uma conta de Administrador usando o código `igreja120131` e uma senha própria.
+4. Confirmar que Administrador consegue consultar, editar, imprimir e excluir cadastros.
 5. Testar campos obrigatórios, CPF, telefone e composição familiar.
 6. Testar celular e computador.
 

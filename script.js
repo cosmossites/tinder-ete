@@ -204,9 +204,9 @@ function validateOwnerAccessCode(code) {
     return true;
   }
 
-  showLoginError("Código de dono incorreto. Crie uma conta normal ou peça o código correto.");
+  showLoginError("Código de Administrador incorreto. Crie uma conta normal ou peça o código correto.");
   showLargeError(
-    "CRIAÇÃO DE DONO BLOQUEADA: somente quem tem o código da igreja pode criar uma conta com acesso total."
+    "CRIAÇÃO DE ADMINISTRADOR BLOQUEADA: somente quem tem o código da igreja pode criar uma conta com acesso total."
   );
   return false;
 }
@@ -220,7 +220,7 @@ function authModeRole(mode = state.authMode) {
 }
 
 function roleLabel(role = state.currentUserRole) {
-  return role === ROLE_ADMIN ? "Dono/administrador" : "Pessoa normal";
+  return role === ROLE_ADMIN ? "Administrador" : "Pessoa normal";
 }
 
 function isAdmin() {
@@ -244,15 +244,15 @@ function applyAccessLevel(role) {
   const notice = $("#role-notice");
   notice.hidden = false;
   notice.textContent = isAdmin()
-    ? "Acesso de dono: você pode cadastrar, consultar, editar, imprimir e excluir registros."
-    : "Acesso normal: você pode preencher e salvar uma ficha. Consultar, editar e excluir cadastros fica liberado somente para donos.";
+    ? "Acesso de Administrador: você pode cadastrar, consultar, editar, imprimir e excluir registros."
+    : "Acesso normal: você pode preencher e salvar uma ficha. Consultar, editar e excluir cadastros fica liberado somente para Administradores.";
 
   if (!isAdmin()) {
     setMobileView("form");
   }
 }
 
-// 9. Alterna a tela entre "Entrar", "Pessoa normal" e "Dono".
+// 9. Alterna a tela entre "Entrar", "Pessoa normal" e "Administrador".
 function setAuthMode(mode) {
   state.authMode = mode;
   const isRegister = isRegisterMode(mode);
@@ -268,12 +268,12 @@ function setAuthMode(mode) {
   $("#auth-help").textContent = mode === "login"
     ? "Entre usando a senha da sua própria conta."
     : isOwnerRegister
-      ? "Conta de dono tem acesso total. Use o código da igreja apenas nesta criação."
+      ? "Conta de Administrador tem acesso total. Use o código da igreja apenas nesta criação."
       : "Conta normal pode preencher e salvar fichas, mas não consulta nem altera todos os cadastros.";
   loginButton.textContent = mode === "login"
     ? "Entrar no sistema"
     : isOwnerRegister
-      ? "Criar conta de dono"
+      ? "Criar conta de Administrador"
       : "Criar conta normal";
   showLoginError("");
 
@@ -427,9 +427,12 @@ function validateFamilyCounts() {
 // 14. Junta todos os campos do formulário em um objeto pronto para o Firestore.
 function getFormData() {
   const nomeCompleto = $("#nome-completo").value.trim();
+  const paroquiaComunidade = $("#paroquia-comunidade").value;
+
   return {
-    paroquia: $("#paroquia").value,
-    comunidade: $("#comunidade").value.trim(),
+    paroquia: paroquiaComunidade,
+    comunidade: "",
+    paroquiaComunidade,
     dataCadastro: $("#data-cadastro").value,
     nomeCompleto,
     nomeBusca: normalizeText(nomeCompleto),
@@ -455,7 +458,7 @@ function getFormData() {
 function validateParishRegistration(payload, editId) {
   if (!state.recordsLoaded) {
     showLargeError(
-      "AGUARDE: a lista de cadastros ainda está carregando. Para evitar cadastro duplicado em outra paróquia, tente salvar novamente em alguns segundos."
+      "AGUARDE: a lista de cadastros ainda está carregando. Para evitar cadastro duplicado em outro local, tente salvar novamente em alguns segundos."
     );
     return false;
   }
@@ -463,7 +466,7 @@ function validateParishRegistration(payload, editId) {
   const originalRecord = editId ? findRecord(editId) : null;
   if (originalRecord?.paroquia && originalRecord.paroquia !== payload.paroquia) {
     showLargeError(
-      `TROCA DE PARÓQUIA BLOQUEADA: este cadastro já pertence à ${originalRecord.paroquia}. Não é permitido mover a mesma pessoa para ${payload.paroquia}.`
+      `TROCA DE PARÓQUIA / COMUNIDADE BLOQUEADA: este cadastro já pertence à ${originalRecord.paroquia}. Não é permitido mover a mesma pessoa para ${payload.paroquia}.`
     );
     return false;
   }
@@ -482,7 +485,7 @@ function validateParishRegistration(payload, editId) {
 
   if (conflictingRecord) {
     showLargeError(
-      `CADASTRO PROIBIDO: este CPF já está cadastrado na ${conflictingRecord.paroquia}. A mesma pessoa não pode ser cadastrada em outra paróquia.`
+      `CADASTRO PROIBIDO: este CPF já está cadastrado em ${conflictingRecord.paroquia}. A mesma pessoa não pode ser cadastrada em outro local.`
     );
     return false;
   }
@@ -507,12 +510,13 @@ function resetAsNewForm() {
 }
 
 function populateForm(record) {
+  const paroquiaComunidade = record.paroquiaComunidade || record.paroquia || record.comunidade || "";
+
   state.pendingCreateRef = null;
   $("#edit-id").value = record.id;
   $("#form-title").textContent = "Editar cadastro";
   $("#save-button").textContent = "Atualizar cadastro";
-  $("#paroquia").value = record.paroquia || "";
-  $("#comunidade").value = record.comunidade || "";
+  $("#paroquia-comunidade").value = paroquiaComunidade;
   $("#data-cadastro").value = record.dataCadastro || "";
   $("#nome-completo").value = record.nomeCompleto || "";
   $("#endereco").value = record.endereco || "";
@@ -554,7 +558,7 @@ function findRecord(id) {
 
 function editRecord(id, printAfter = false) {
   if (!isAdmin()) {
-    showToast("Editar ou imprimir cadastros salvos é permitido somente para contas de dono.", true);
+    showToast("Editar ou imprimir cadastros salvos é permitido somente para contas de Administrador.", true);
     return;
   }
 
@@ -584,7 +588,7 @@ function renderRecords() {
   if (!isAdmin()) {
     $("#records-count").textContent = "Acesso normal";
     listStatus.hidden = false;
-    listStatus.textContent = "Consulta disponível somente para contas de dono.";
+    listStatus.textContent = "Consulta disponível somente para contas de Administrador.";
     return;
   }
 
@@ -620,7 +624,7 @@ function renderRecords() {
     const meta = document.createElement("div");
     meta.className = "record-meta";
     meta.append(
-      createTextElement("span", "", record.comunidade || record.paroquia || "Comunidade não informada"),
+      createTextElement("span", "", record.paroquiaComunidade || record.paroquia || record.comunidade || "Paróquia / Comunidade não informada"),
       createTextElement("span", "", `CPF: ${record.cpf || "não informado"}`),
       createTextElement("span", "", `Telefone: ${record.telefone || "não informado"}`)
     );
@@ -761,7 +765,7 @@ function setMobileView(view) {
 
 function openRecordsOnMobile() {
   if (!isAdmin()) {
-    showToast("Consulta de cadastros disponível somente para contas de dono.", true);
+    showToast("Consulta de cadastros disponível somente para contas de Administrador.", true);
     return;
   }
 
@@ -779,7 +783,7 @@ loginForm.addEventListener("submit", async (event) => {
   const isOwnerRegister = state.authMode === "register-admin";
   const requestedRole = authModeRole();
   const defaultButtonText = isRegister
-    ? isOwnerRegister ? "Criar conta de dono" : "Criar conta normal"
+    ? isOwnerRegister ? "Criar conta de Administrador" : "Criar conta normal"
     : "Entrar no sistema";
   setBusy(loginButton, true, isRegister ? "Criando conta..." : "Entrando...", defaultButtonText);
 
@@ -903,7 +907,7 @@ cadastroForm.addEventListener("submit", async (event) => {
         "firestore/timeout"
       );
       state.pendingCreateRef = null;
-      showToast(isAdmin() ? "Cadastro salvo com sucesso." : "Ficha salva com sucesso. A consulta fica disponível somente para donos.");
+      showToast(isAdmin() ? "Cadastro salvo com sucesso." : "Ficha salva com sucesso. A consulta fica disponível somente para Administradores.");
     }
     resetForm();
     if (isAdmin() && window.matchMedia("(max-width: 820px)").matches) {
@@ -929,7 +933,7 @@ deleteDialog.addEventListener("close", async () => {
 
   if (!isAdmin()) {
     state.deleteId = null;
-    showToast("Excluir cadastros é permitido somente para contas de dono.", true);
+    showToast("Excluir cadastros é permitido somente para contas de Administrador.", true);
     return;
   }
 
